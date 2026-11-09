@@ -13,3 +13,7 @@ cooldown-ms: 0
 
 # Print an informational startup message and relay diagnostics to the console.
 debug: false
+
+# Hide Geyser's secure-chat warning because BedrockSecureChat provides the chat relay.
+# This sets the JVM system property Geyser.PrintSecureChatInformation=false.
+suppress-geyser-secure-chat-warning: true
