@@ -1,0 +1,9 @@
+name: BedrockSecureChat
+version: '${version}'
+main: cn.frostcraft.bedrocksecurechat.BedrockSecureChatPlugin
+api-version: '26.2'
+author: FrostCraft
+description: Allows Geyser Bedrock players to chat while secure-profile enforcement remains enabled.
+depend:
+  - packetevents
+  - Geyser-Spigot
