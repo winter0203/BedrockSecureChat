@@ -45,6 +45,13 @@ public final class BedrockSecureChatPlugin extends JavaPlugin {
         saveDefaultConfig();
         reloadLocalSettings();
 
+        // Geyser prints an informational warning to Bedrock players when secure
+        // profile enforcement is enabled. This plugin provides the missing chat
+        // relay, so suppress that now-misleading Geyser notice when configured.
+        if (getConfig().getBoolean("suppress-geyser-secure-chat-warning", true)) {
+            System.setProperty("Geyser.PrintSecureChatInformation", "false");
+        }
+
         if (!Bukkit.getPluginManager().isPluginEnabled("packetevents")) {
             getLogger().severe("PacketEvents is missing or not enabled. Disabling BedrockSecureChat.");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -93,9 +100,16 @@ public final class BedrockSecureChatPlugin extends JavaPlugin {
                     return;
                 }
 
-                // Do not block, cancel, or rewrite the original packet. It still
-                // needs to reach vanilla so its secure-chat acknowledgement state
-                // remains in sync with the Geyser client.
+                // Geyser Bedrock chat is relayed below as an unsigned system-style
+                // Paper chat event. Cancel the original player-chat packet so vanilla
+                // does not reject its missing Mojang profile signature and send the
+                // misleading "missing profile public key" warning to the Bedrock client.
+                // Chat acknowledgements use separate packets and are not cancelled.
+                if (!isGeyserPlayer(playerId)) {
+                    return;
+                }
+
+                event.setCancelled(true);
                 Bukkit.getScheduler().runTask(BedrockSecureChatPlugin.this,
                         () -> relayIfBedrock(playerId, message));
             }
@@ -140,10 +154,6 @@ public final class BedrockSecureChatPlugin extends JavaPlugin {
     private void relayIfBedrock(UUID playerId, String message) {
         Player player = Bukkit.getPlayer(playerId);
         if (player == null || !player.isOnline()) {
-            return;
-        }
-
-        if (!isGeyserPlayer(playerId)) {
             return;
         }
 
