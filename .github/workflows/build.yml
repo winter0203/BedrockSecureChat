@@ -3,12 +3,12 @@ name: Build
 on:
   push:
     branches: ["main", "master"]
-    tags: ["v*", "*"]
+    tags: ["*"]
   pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -36,3 +36,12 @@ jobs:
         with:
           name: BedrockSecureChat
           path: build/libs/BedrockSecureChat-*.jar
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: BedrockSecureChat ${{ github.ref_name }}
+          generate_release_notes: true
+          files: build/libs/BedrockSecureChat-*.jar
