@@ -1,0 +1,15 @@
+# BedrockSecureChat configuration
+
+# Relay normal Bedrock chat messages through Paper's AsyncChatEvent.
+# Java players' packets are never intercepted or modified.
+enabled: true
+
+# Maximum message length. Minecraft chat packets are limited to 256 characters.
+max-message-length: 256
+
+# Minimum delay between relayed messages from the same Bedrock player.
+# Set to 0 to disable the additional cooldown.
+cooldown-ms: 0
+
+# Print an informational startup message and relay diagnostics to the console.
+debug: false
